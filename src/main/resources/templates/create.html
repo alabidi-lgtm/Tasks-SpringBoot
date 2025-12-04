@@ -16,25 +16,30 @@
 
 <section class="bg-light py-4">
   <div class="container">
-    <form th:action="@{/}" method="post">
-      <div class="mb-3">
-        <label for="title" class="form-label">Title:</label>
-        <input type="text" class="form-control" id="title" name="title" th:field="*{task.title}">
-      </div>
-      <div class="mb-3">
-        <label for="description" class="form-label">Description:</label>
-        <input type="text" class="form-control" id="description" name="description" th:field="*{task.description}">
-      </div>
-      <div class="mb-3">
-        <label for="priority">Priority</label>
-          <select id="priority" name="priority" th:field="*{priority}">
-              <option th:each="p : ${priorities}"
-                      th:value="${p}"
-                      th:text="${p}">MEDIUM</option>
-          </select>
-      </div>
-      <button type="submit" class="btn btn-primary">Create</button>
-    </form>
+    <form th:action="@{/}" th:object="${task}" method="post">
+  <div class="mb-3">
+    <label for="title" class="form-label">Title:</label>
+    <input type="text" class="form-control" id="title" th:field="*{title}">
+  </div>
+
+  <div class="mb-3">
+    <label for="description" class="form-label">Description:</label>
+    <input type="text" class="form-control" id="description" th:field="*{description}">
+  </div>
+
+  <div class="mb-3">
+    <label for="priority" class="form-label">Priority</label>
+    <select id="priority" class="form-select" th:field="*{priority}">
+      <option th:each="p : ${priorityValues}"
+              th:value="${p}"
+              th:text="${p}">
+      </option>
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Create</button>
+</form>
+
 
     <a href="/" class="btn btn-secondary mt-3">Back to List</a>
   </div>

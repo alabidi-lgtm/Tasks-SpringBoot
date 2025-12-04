@@ -1,11 +1,10 @@
 package com.testProjects.todolist.controllers;
-import com.testProjects.todolist.models.User;
-import com.testProjects.todolist.repositories.TaskRepository;
+
 import com.testProjects.todolist.models.Task;
+import com.testProjects.todolist.models.Priority;
+import com.testProjects.todolist.models.User;
 import com.testProjects.todolist.repositories.UserRepository;
 import com.testProjects.todolist.services.Impl.TaskServiceImpl;
-import com.testProjects.todolist.models.Priority;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,29 +13,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.util.List;
 
 @Controller
 @RequestMapping("/")
 public class TaskController {
 
-    @Autowired
     private final TaskServiceImpl taskService;
+    private final UserRepository userRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    public TaskController(TaskServiceImpl taskService) {
+    public TaskController(TaskServiceImpl taskService, UserRepository userRepository) {
         this.taskService = taskService;
+        this.userRepository = userRepository;
     }
-
-//    @GetMapping
-//    public String getAllTasks(Model model) {
-//        List<Task> tasks = taskService.findAllTasks();
-//        model.addAttribute("tasks", tasks);
-//        return "list";
-//    }
 
     @GetMapping("/{id}")
     public String getTaskById(@PathVariable Long id, Model model) throws Throwable {
@@ -48,57 +38,53 @@ public class TaskController {
     @GetMapping("/tasks/create")
     public String showCreateForm(Model model) {
         model.addAttribute("task", new Task());
+        // 👇 this is what Thymeleaf needs for the priority dropdown
+        model.addAttribute("priorityValues", Priority.values());
         return "create";
     }
 
-//    @PostMapping
-//    public String createTask(@ModelAttribute("task") Task task) {
-//        taskService.saveTask(task);
-//        return "redirect:/";
-//    }
     @GetMapping()
-    public String getALlTasksForCurrentUser(Model model){
+    public String getALlTasksForCurrentUser(Model model) {
         List<Task> tasks = taskService.getTasksForCurrentUser();
         model.addAttribute("tasks", tasks);
         return "list";
     }
-    @PostMapping
-    public String createTask(@ModelAttribute Task task, Model model) {
 
+    @PostMapping
+    public String createTask(@ModelAttribute("task") Task task) {
+
+        // current logged-in username
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalName = authentication.getName();
-
-        // provide priorities to the view if you need them
-        model.addAttribute("priorityValues", Priority.values());
 
         User user = userRepository.findByUsername(currentPrincipalName).orElse(null);
         assert user != null;
 
-        // if Task has a user field, you probably want:
+        // if Task has a user field, you can link it here:
         // task.setUser(user);
 
         taskService.saveTask(task);
 
-        // Redirect to the task details page for the newly created task
+        // redirect to details page of the created task
         return "redirect:/" + task.getId();
     }
 
-
-
     private User getCurrentUser() {
-        // Get the username of the currently authenticated user
-        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        // Create a user object with the username
+        String username = ((UserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal())
+                .getUsername();
         User user = new User();
         user.setUsername(username);
         return user;
     }
 
-
     @GetMapping("/{id}/edit")
     public String showEditForm(@PathVariable Long id, Model model) throws Throwable {
         Task task = (Task) taskService.findTaskById(id);
         model.addAttribute("task", task);
+        model.addAttribute("priorityValues", Priority.values());
         return "edit";
     }
 
@@ -108,6 +94,7 @@ public class TaskController {
         Task task = (Task) taskService.findTaskById(id);
         task.setTitle(taskDetails.getTitle());
         task.setDescription(taskDetails.getDescription());
+        task.setPriority(taskDetails.getPriority()); // keep priority on update
         taskService.saveTask(task);
         return "redirect:/";
     }
@@ -117,5 +104,4 @@ public class TaskController {
         taskService.deleteTask(id);
         return "redirect:/";
     }
-    
 }
