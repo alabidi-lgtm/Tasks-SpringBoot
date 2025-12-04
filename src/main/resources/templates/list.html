@@ -41,6 +41,7 @@
     <tr th:each="task : ${tasks}">
       <td th:text="${task.title}"></td>
       <td th:text="${task.description}"></td>
+      <td th:text="${task.priority}">MEDIUM</td>
       <td>
         <a class="btn btn-primary btn-sm me-1" th:href="@{/{id}(id=${task.id})}">View</a>
         <a class="btn btn-warning btn-sm me-1" th:href="@{/{id}/edit(id=${task.id})}">Edit</a>

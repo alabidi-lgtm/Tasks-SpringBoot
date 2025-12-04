@@ -1,5 +1,6 @@
 package com.testProjects.todolist.services.Impl;
 
+import com.testProjects.todolist.models.Priority;
 import com.testProjects.todolist.models.Task;
 import com.testProjects.todolist.models.User;
 import com.testProjects.todolist.repositories.TaskRepository;
@@ -67,6 +68,12 @@ public class TaskServiceImpl implements TaskService {
         if (task.getUser() == user)
             taskRepository.deleteById(id);
     }
+    @Override
+    public List<Task> getTasksByPriority(Priority priority) {
+        return taskRepository.findByPriority(priority);
+    }
+
+    
 
     // Other service methods for task operations
 }

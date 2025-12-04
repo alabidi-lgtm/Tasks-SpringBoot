@@ -1,5 +1,6 @@
 package com.testProjects.todolist.services;
 
+import com.testProjects.todolist.models.Priority;
 import com.testProjects.todolist.models.Task;
 
 import java.util.List;
@@ -10,4 +11,5 @@ public interface TaskService {
     List<Task> getTasksForCurrentUser();
     Task findTaskById(Long id);
     void deleteTask(Long id);
+    List<Task> getTasksByPriority(Priority priority);
 }

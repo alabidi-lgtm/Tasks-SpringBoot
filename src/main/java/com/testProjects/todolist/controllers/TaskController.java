@@ -4,6 +4,8 @@ import com.testProjects.todolist.repositories.TaskRepository;
 import com.testProjects.todolist.models.Task;
 import com.testProjects.todolist.repositories.UserRepository;
 import com.testProjects.todolist.services.Impl.TaskServiceImpl;
+import com.testProjects.todolist.models.Priority;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 
@@ -60,20 +63,26 @@ public class TaskController {
         return "list";
     }
     @PostMapping
-    public String createTask(@ModelAttribute Task task) {
+    public String createTask(@ModelAttribute Task task, Model model) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalName = authentication.getName();
 
+        // provide priorities to the view if you need them
+        model.addAttribute("priorityValues", Priority.values());
+
         User user = userRepository.findByUsername(currentPrincipalName).orElse(null);
         assert user != null;
-        Long userId = user.getId();
 
+        // if Task has a user field, you probably want:
+        // task.setUser(user);
 
         taskService.saveTask(task);
+
         // Redirect to the task details page for the newly created task
-        return "redirect:/" + task.getId(); // Assuming the task details page URL includes the task ID
+        return "redirect:/" + task.getId();
     }
+
 
 
     private User getCurrentUser() {
@@ -108,4 +117,5 @@ public class TaskController {
         taskService.deleteTask(id);
         return "redirect:/";
     }
+    
 }
