@@ -30,6 +30,14 @@
       </option>
     </select>
   </div>
+  <div class="mb-3">
+  <label for="deadline" class="form-label">Deadline (optional)</label>
+  <input id="deadline"
+         type="date"
+         class="form-control"
+         th:field="*{deadline}">
+</div>
+
 
   <button type="submit" class="btn btn-primary">Update</button>
 </form>

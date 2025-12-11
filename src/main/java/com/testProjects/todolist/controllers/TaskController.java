@@ -111,10 +111,13 @@ public class TaskController {
         Task task = (Task) taskService.findTaskById(id);
         task.setTitle(taskDetails.getTitle());
         task.setDescription(taskDetails.getDescription());
-        task.setPriority(taskDetails.getPriority()); // keep priority on update
+        task.setPriority(taskDetails.getPriority());
+        task.setDeadline(taskDetails.getDeadline());   // 👈 add this
+
         taskService.saveTask(task);
         return "redirect:/";
     }
+
 
     @PostMapping("/{id}/delete")
     public String deleteTask(@PathVariable Long id) {

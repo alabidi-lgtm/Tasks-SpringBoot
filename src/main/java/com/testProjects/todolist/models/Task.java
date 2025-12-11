@@ -3,6 +3,9 @@ package com.testProjects.todolist.models;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 
 @Entity
 @Getter
@@ -19,6 +22,14 @@ public class Task {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     
+    private LocalDate deadline;          // optional deadline (date only)
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;     // automatic timestamp
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
     
     @Enumerated(EnumType.STRING)
     private Priority priority = Priority.MEDIUM;
@@ -30,5 +41,8 @@ public class Task {
     public void setPriority(Priority priority) {
         this.priority = priority;
     }
+
+    
+
 
 }
