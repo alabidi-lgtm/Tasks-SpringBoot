@@ -44,11 +44,28 @@ public class TaskController {
     }
 
     @GetMapping()
-    public String getALlTasksForCurrentUser(Model model) {
+    public String getALlTasksForCurrentUser(
+            @RequestParam(value = "q", required = false) String query,
+            Model model) {
+
         List<Task> tasks = taskService.getTasksForCurrentUser();
+
+        if (query != null && !query.isBlank()) {
+            String qLower = query.toLowerCase();
+            tasks = tasks.stream()
+                    .filter(t ->
+                            (t.getTitle() != null && t.getTitle().toLowerCase().contains(qLower)) ||
+                            (t.getDescription() != null && t.getDescription().toLowerCase().contains(qLower)) ||
+                            (t.getId() != null && String.valueOf(t.getId()).contains(query))
+                    )
+                    .toList();
+        }
+
         model.addAttribute("tasks", tasks);
+        model.addAttribute("q", query); // keep search term in the box
         return "list";
     }
+
 
     @PostMapping
     public String createTask(@ModelAttribute("task") Task task) {
@@ -66,7 +83,7 @@ public class TaskController {
         taskService.saveTask(task);
 
         // redirect to details page of the created task
-        return "redirect:/" + task.getId();
+        return "redirect:/";
     }
 
     private User getCurrentUser() {
