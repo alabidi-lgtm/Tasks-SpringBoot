@@ -90,4 +90,52 @@ class TaskServiceImplTest {
         assertEquals(Priority.HIGH, result.get(0).getPriority());
         verify(taskRepository).findByPriority(Priority.HIGH);
     }
+
+        @Test
+    void findTaskById_shouldReturnTask_whenExists() {
+        Task task = new Task();
+        task.setId(42L);
+        task.setTitle("Find me");
+
+        when(taskRepository.findById(42L)).thenReturn(Optional.of(task));
+
+        Task result = taskService.findTaskById(42L);
+
+        assertNotNull(result);
+        assertEquals(42L, result.getId());
+        assertEquals("Find me", result.getTitle());
+        verify(taskRepository).findById(42L);
+    }
+
+    @Test
+    void deleteTask_shouldDeleteWhenUserOwnsTask() {
+        // --- fake logged-in user "admin" ---
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getName()).thenReturn("admin");
+
+        SecurityContext context = mock(SecurityContext.class);
+        when(context.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(context);
+        // -----------------------------------
+
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("admin");
+
+        Task task = new Task();
+        task.setId(99L);
+        task.setUser(user);  // owner is the same instance
+
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(user));
+        when(taskRepository.findById(99L)).thenReturn(Optional.of(task));
+
+        // act
+        taskService.deleteTask(99L);
+
+        // assert: deleteById must be called
+        verify(userRepository).findByUsername("admin");
+        verify(taskRepository).findById(99L);
+        verify(taskRepository).deleteById(99L);
+    }
+
 }
