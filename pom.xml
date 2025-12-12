@@ -124,28 +124,36 @@
                     </execution>
                 </executions>
             </plugin>
-                        <plugin>
+            <plugin>
                 <groupId>org.pitest</groupId>
                 <artifactId>pitest-maven</artifactId>
-                <version>1.15.9</version>
+                <version>1.15.0</version>
+
+                <!-- JUnit 5 integration for PIT -->
+                <dependencies>
+                    <dependency>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-junit5-plugin</artifactId>
+                        <version>1.2.1</version>
+                    </dependency>
+                </dependencies>
+
                 <configuration>
-                    <!-- Which classes to mutate -->
+                    <!-- mutate only your service classes -->
                     <targetClasses>
                         <param>com.testProjects.todolist.services.*</param>
                     </targetClasses>
 
-                    <!-- Which tests to run -->
+                    <!-- tests to run -->
                     <targetTests>
                         <param>com.testProjects.todolist.*</param>
                     </targetTests>
 
-                    <!-- Don't fail the build if score is low -->
+                    <!-- don’t fail build if score is low -->
                     <mutationThreshold>0</mutationThreshold>
-
-                    <!-- Use JUnit 5 plugin -->
-                    <junit5PluginVersion>1.2.1</junit5PluginVersion>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 
