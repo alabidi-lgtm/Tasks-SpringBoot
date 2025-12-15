@@ -17,8 +17,10 @@ import java.util.List;
 public class TaskServiceImpl implements TaskService {
 
     @Autowired
+    //@ spec_public
     private TaskRepository taskRepository;
     @Autowired
+    //@ spec_public
     private UserRepository userRepository;
 
     //@ ensures \result != null;
